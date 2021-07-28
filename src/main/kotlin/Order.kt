@@ -1,15 +1,14 @@
 import java.util.*
 
-class Order(var price: Int, var quantity: Int, type: OrderType){
+class Order(var price: Int, var quantity: Int, val type: OrderType){
 
     var timestamp = Calendar.getInstance().time
     var orderNum = UUID.randomUUID()
-    var fullfilled = LinkedList<Order>()
+    // arraylist to store all trades that happen in the orderbook
+    var orderTrades: ArrayList<Trade> = ArrayList<Trade>()
 
-    fun fulfillOrder( matchingOrders: LinkedList<Order>){
-        TODO("add orders to fulfilled list")
+    fun isFullfilled(): Boolean{
+        return quantity == 0
     }
-    fun ifFulfilled(): Boolean { return fullfilled.isEmpty() }
-
 }
 
