@@ -1,5 +1,8 @@
 import java.util.*
 
+/**
+ * Stores a list or orders for a given price and order type/side
+ */
 class ListOrdersAtPrice(
     val price: Int
 ) : Comparable<ListOrdersAtPrice> {
@@ -7,7 +10,9 @@ class ListOrdersAtPrice(
     var orders: LinkedList<Order> = LinkedList<Order>()
     var quantityTotal: Int = 0
 
-
+    /**
+     * Add a new order to this list
+     */
     fun addOrder(newOrder: Order) {
         this.quantityTotal += newOrder.quantity
         this.orders.add(newOrder)
@@ -15,6 +20,9 @@ class ListOrdersAtPrice(
     }
 
     override fun compareTo(other: ListOrdersAtPrice): Int {
+//        This compareTo class is used for the PriorityQueue implementation
+//        to allow us to compare the prices or orders in this class with other
+//        price tiers.
         return this.orders.peek().price - other.orders.peek().price
     }
 
@@ -26,14 +34,17 @@ class ListOrdersAtPrice(
         orders.removeAt(i)
     }
 
+    /**
+     * Process trades for the [newBidOrder] with the sell orders in this list
+     */
     fun processTradesBidOrder(newBidOrder: Order, orderBook: OrderBook) {
 
         while ((orders.size > 0) && (newBidOrder.quantity > 0)) {
-            var newTrade: Trade;
+            var newTrade: Trade
             val currentAskOrder = orders.peek()
             if (newBidOrder.quantity < currentAskOrder.quantity) {
                 /// quantity from seller is more than the buyer wants to buy
-                currentAskOrder.quantity -= newBidOrder.quantity
+                quantityTotal -= newBidOrder.quantity
                 newTrade = Trade(
                     buyer = newBidOrder,
                     seller = currentAskOrder,
@@ -41,11 +52,11 @@ class ListOrdersAtPrice(
                     OrderType.BID,
                     sequence = orderBook.sequence++
                 )
-                newBidOrder.fullfill(newTrade)
+                newBidOrder.fulfill(newTrade)
                 currentAskOrder.addTrade(newTrade)
             } else {
                 // the quantity from seller is less than what the buyer wants to buy
-                newBidOrder.quantity -= currentAskOrder.quantity
+                quantityTotal -= currentAskOrder.quantity
                 newTrade = Trade(
                     buyer = newBidOrder,
                     seller = currentAskOrder,
@@ -53,9 +64,9 @@ class ListOrdersAtPrice(
                     OrderType.BID,
                     sequence = orderBook.sequence++
                 )
-                currentAskOrder.fullfill(newTrade)
+                currentAskOrder.fulfill(newTrade)
                 newBidOrder.addTrade(newTrade)
-                // remove fullfillsed order from orderbook
+                // remove fulfilled order from order book
                 orders.pop()
             }
             orderBook.addTrade(newTrade)
@@ -63,14 +74,19 @@ class ListOrdersAtPrice(
 
     }
 
+    /**
+     * Process trades for the [newAskOrder] with the bid orders in this list
+     */
     fun processTradesAskOrder(newAskOrder: Order, orderBook: OrderBook) {
 
+        // Go through each sell order in this list until all the quantity for [newAskOrder] has been fulfilled.
         while ((orders.size > 0) && (newAskOrder.quantity > 0)) {
-            var newTrade: Trade;
+            var newTrade: Trade
             val currentBidOrder = orders.peek()
 
             if (newAskOrder.quantity < currentBidOrder.quantity) {
                 /// quantity from seller is LESS than the buyer wants to buy
+                quantityTotal -= newAskOrder.quantity
                 newTrade = Trade(
                     buyer = newAskOrder,
                     seller = currentBidOrder,
@@ -78,10 +94,11 @@ class ListOrdersAtPrice(
                     OrderType.ASK,
                     sequence = orderBook.sequence++
                 )
-                newAskOrder.fullfill(newTrade)
+                newAskOrder.fulfill(newTrade)
                 currentBidOrder.addTrade(newTrade)
             } else {
                 // the quantity from seller is MORE than what the buyer wants to buy
+                quantityTotal -= currentBidOrder.quantity
                 newTrade = Trade(
                     buyer = newAskOrder,
                     seller = currentBidOrder,
@@ -89,12 +106,12 @@ class ListOrdersAtPrice(
                     OrderType.ASK,
                     sequence = orderBook.sequence++
                 )
-                currentBidOrder.fullfill(newTrade)
+                currentBidOrder.fulfill(newTrade)
                 newAskOrder.addTrade(newTrade)
-                // remove fullfillsed order from orderbook
+                // remove fulfilled order from order book
                 orders.pop()
             }
-            // add trade to orderbook
+            // add trade to order book
             orderBook.addTrade(newTrade)
         }
 

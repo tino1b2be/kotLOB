@@ -1,16 +1,22 @@
 import java.util.*
 
+/**
+ * Represents an order in the order book
+ */
 class Order(
     val price: Int,
     var quantity: Int,
     val type: OrderType,
     val timestamp: Date = Calendar.getInstance().time,
     val id: UUID = UUID.randomUUID(),
-    // arraylist to store all trades that happen in the orderbook
-    var orderTrades: ArrayList<Trade> = ArrayList<Trade>()
+    // arraylist to store all trades that happen in the order book
+    private var orderTrades: ArrayList<Trade> = ArrayList<Trade>()
 ) {
 
-    fun isFullfilled(): Boolean {
+    /**
+     * returns true if this order has been fulfilled
+     */
+    fun isFulfilled(): Boolean {
         return quantity == 0
     }
 
@@ -23,10 +29,10 @@ class Order(
     }
 
     /**
-     * Order fullfilled by the [newTrade].
+     * Order fulfilled by the [newTrade].
      * All quantity from this order is bought/sold.
      */
-    fun fullfill(newTrade: Trade) {
+    fun fulfill(newTrade: Trade) {
         quantity = 0
         addTrade(newTrade)
     }

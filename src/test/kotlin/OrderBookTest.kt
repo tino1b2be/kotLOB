@@ -41,23 +41,23 @@ class OrderBookTest {
     }
 
     @Test
-    fun testLargeBidAndAskTrades(){
+    fun testLargeBidAndAskTrades() {
 
 
     }
 
     @Test
-    fun testEmptyTradeHistory(){
+    fun testEmptyTradeHistory() {
 
     }
 
     @Test
-    fun testSmallTradeHistory(){
+    fun testSmallTradeHistory() {
 
     }
 
     @Test
-    fun testMaxTradeHistory(){
+    fun testMaxTradeHistory() {
 
     }
 

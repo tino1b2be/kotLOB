@@ -1,5 +1,8 @@
 import java.util.*
 
+/**
+ * Represents a trade in the order book
+ */
 class Trade(
     var buyer: Order,
     var seller: Order,
@@ -10,14 +13,15 @@ class Trade(
     var timestamp: Date = Calendar.getInstance().time
 ) {
 
-
+    /**
+     * returns a JSON formatted string representation of the trade
+     */
     override fun toString(): String {
-        var takerString: String
-        if (taker == OrderType.ASK) takerString = "ask" else takerString = "buy"
+        var takerString: String = if (taker == OrderType.ASK) "ask" else "buy"
         return "{\n" +
                 "'price':'${buyer.price}',\n" +
                 "'quantity':'$quantity',\n" +
-                "'tradedAt':'${timestamp.toString()}',\n" +
+                "'tradedAt':'$timestamp',\n" +
                 "'takerSide':'$takerString',\n" +
                 "'sequenceId':$sequence,\n" +
                 "'id':'$id',\n" +

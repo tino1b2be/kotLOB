@@ -2,21 +2,24 @@ import OrderType.*
 import java.util.*
 import kotlin.collections.HashMap
 
+/**
+ * Implementation of a Limit Order Book
+ */
 class OrderBook(
     // priority queue with lowest asking price at top TODO("could possibly optimise asks")
     var asks: PriorityQueue<ListOrdersAtPrice> = PriorityQueue<ListOrdersAtPrice>(),
     // priority queue with highest bidding price at top TODO("could possibly optimise bids")
     var bids: PriorityQueue<ListOrdersAtPrice> = PriorityQueue<ListOrdersAtPrice>(Collections.reverseOrder()),
-    // arraylist to store all trades that happen in the orderbook TODO("could possibly optimise trades list")
+    // arraylist to store all trades that happen in the order book TODO("could possibly optimise trades list")
     var trades: ArrayList<Trade> = ArrayList<Trade>(),
     // a Map to quickly search for the listOrdersAtPrice
-    var listPriceMap: HashMap<Int, ListOrdersAtPrice> = HashMap<Int, ListOrdersAtPrice>(),
+    var listPriceMap: HashMap<Int, ListOrdersAtPrice> = HashMap(),
     var lastUpdateTime: Date = Calendar.getInstance().time,
     var sequence: Int = 0
 ) {
 
     /**
-     * Add trade to orderbook
+     * Add trade record to order book
      */
     fun addTrade(trade: Trade) {
         trades.add(trade)
@@ -73,7 +76,7 @@ class OrderBook(
             if (index >= num) break
         }
         // TODO format the date to ISO 8601
-        returnString = "$returnString \n  ],  \"LastChange\": \"${lastUpdateTime.toString()}\"\n}"
+        returnString = "$returnString \n  ],  \"LastChange\": \"$lastUpdateTime\"\n}"
 
         return returnString
     }
@@ -149,18 +152,20 @@ class OrderBook(
         // Search for a list with the price of the new order
         // if you can't find the list, create and return a new empty one
         var listPrice = listPriceMap[order.price]
-        if (listPrice != null) {
-            return listPrice
+        return if (listPrice != null) {
+            listPrice
         } else {
             listPrice = ListOrdersAtPrice(order.price)
-            // add list to orderbook priority queue and Map
-            listPriceMap.put(order.price, listPrice)
+            // add list to order book priority queue and Map
+            listPriceMap[order.price] = listPrice
             if (order.type == BID) bids.add(listPrice) else asks.add(listPrice)
-
-            return listPrice
+            listPrice
         }
     }
 
+    /**
+     * returns true is the order book has no orders
+     */
     fun isEmpty(): Boolean {
         return asks.isEmpty() && bids.isEmpty()
     }
