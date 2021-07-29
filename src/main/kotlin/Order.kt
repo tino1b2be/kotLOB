@@ -10,5 +10,15 @@ class Order(var price: Int, var quantity: Int, val type: OrderType){
     fun isFullfilled(): Boolean{
         return quantity == 0
     }
+
+    fun addTrade(newTrade: Trade) {
+        orderTrades.add(newTrade)
+    }
+
+    fun fullfill(newTrade: Trade) {
+        quantity = 0
+        addTrade(newTrade)
+    }
+
 }
 
