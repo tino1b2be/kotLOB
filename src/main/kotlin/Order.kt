@@ -5,7 +5,7 @@ class Order(
     var quantity: Int,
     val type: OrderType,
     val timestamp: Date = Calendar.getInstance().time,
-    val orderId: UUID = UUID.randomUUID(),
+    val id: UUID = UUID.randomUUID(),
     // arraylist to store all trades that happen in the orderbook
     var orderTrades: ArrayList<Trade> = ArrayList<Trade>()
 ) {

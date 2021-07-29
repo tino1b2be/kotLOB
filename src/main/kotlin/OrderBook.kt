@@ -3,33 +3,102 @@ import java.util.*
 import kotlin.collections.HashMap
 
 class OrderBook(
-    // priority queue with lowest asking price at top
+    // priority queue with lowest asking price at top TODO("could possibly optimise asks")
     var asks: PriorityQueue<ListOrdersAtPrice> = PriorityQueue<ListOrdersAtPrice>(),
-    // priority queue with highest bidding price at top
+    // priority queue with highest bidding price at top TODO("could possibly optimise bids")
     var bids: PriorityQueue<ListOrdersAtPrice> = PriorityQueue<ListOrdersAtPrice>(Collections.reverseOrder()),
-    // arraylist to store all trades that happen in the orderbook
+    // arraylist to store all trades that happen in the orderbook TODO("could possibly optimise trades list")
     var trades: ArrayList<Trade> = ArrayList<Trade>(),
     // a Map to quickly search for the listOrdersAtPrice
-    var listPriceMap: HashMap<Int, ListOrdersAtPrice> = HashMap< Int, ListOrdersAtPrice >()
+    var listPriceMap: HashMap<Int, ListOrdersAtPrice> = HashMap<Int, ListOrdersAtPrice>(),
+    var lastUpdateTime: Date = Calendar.getInstance().time,
+    var sequence: Int = 0
 ) {
 
-
-    fun addTrade( trade: Trade){
+    /**
+     * Add trade to orderbook
+     */
+    fun addTrade(trade: Trade) {
         trades.add(trade)
     }
 
-    fun processLimitOrder(newOrder: Order) {
+    /**
+     * Get all trades
+     */
+    fun getAllOrders() {
+        TODO("return a linkedList with n prices from order book")
+    }
 
-        if (newOrder.type == ASK) {
-            processAskOrder(newOrder)
+    /**
+     *  get the most recent [num] trades
+     */
+    fun getOrders(num: Int): LinkedList<ListOrdersAtPrice> {
+        TODO("return a linkedList with n prices from order book")
+    }
+
+    /**
+     * Return JSON formatted string of the top [num] bids and [num] asks from the order book
+     */
+    fun getOrderBookJSON(num: Int): String {
+
+        var count = 0
+        var returnString = "{\n \"Asks\":[\n  "
+        // get top [num] asks
+        for ((index, listOfOrders) in asks.withIndex()) {
+            var listString = "{\n" +
+                    "   \"side\":\"sell\",\n" +
+                    "   \"quantity\":\"${listOfOrders.quantityTotal}\",\n" +
+                    "   \"price\":\"${listOfOrders.price}\",\n" +
+                    "   \"orderCount\":${listOfOrders.getSize()}\n" +
+                    "}"
+
+            if (index < num && index < asks.size) listString = "$listString," // add comma
+            returnString = "$returnString $listString"
+            if (index >= num) break
         }
-        else {
-            processBidOrder(newOrder)
+
+        returnString = "$returnString\n  ],\n  \"Bids\":[\n  "
+
+        // get top [num] bids
+        for ((index, listOfOrders) in bids.withIndex()) {
+            var listString = "{\n" +
+                    "   \"side\":\"buy\",\n" +
+                    "   \"quantity\":\"${listOfOrders.quantityTotal}\",\n" +
+                    "   \"price\":\"${listOfOrders.price}\",\n" +
+                    "   \"orderCount\":${listOfOrders.getSize()}\n" +
+                    "}"
+
+            if (index < num && index < bids.size) listString = "$listString," // add comma
+            returnString = "$returnString $listString" // append orders to string
+            if (index >= num) break
+        }
+        // TODO format the date to ISO 8601
+        returnString = "$returnString \n  ],  \"LastChange\": \"${lastUpdateTime.toString()}\"\n}"
+
+        return returnString
+    }
+
+    /**
+     * Return JSON formatted string of the top 20 bids and 20 asks from the order book
+     */
+    fun getOrderBookJSON(): String {
+        return getOrderBookJSON(20)
+    }
+
+    /**
+     * Process a [newLimitOrder] and add it to the order book
+     */
+    fun processLimitOrder(newLimitOrder: Order) {
+
+        if (newLimitOrder.type == ASK) {
+            processAskOrder(newLimitOrder)
+        } else {
+            processBidOrder(newLimitOrder)
         }
 
         // All the best prices are finished. If there's still quantity remaining, add order to book
-        if (newOrder.quantity > 0) {
-            insertIntoOrderBook(newOrder)
+        if (newLimitOrder.quantity > 0) {
+            insertIntoOrderBook(newLimitOrder)
         }
 
     }
@@ -42,7 +111,7 @@ class OrderBook(
 
         while ((!asks.isEmpty()) && newBidOrder.quantity > 0 && newBidOrder.price >= asks.peek().price) {
             val lowestAsks: ListOrdersAtPrice = asks.peek()
-             lowestAsks.processTradesBidOrder(newBidOrder, this)
+            lowestAsks.processTradesBidOrder(newBidOrder, this)
             // remove list if there are no more orders at this price.
             if (lowestAsks.getSize() == 0) asks.poll()
         }
@@ -55,7 +124,7 @@ class OrderBook(
     private fun processAskOrder(newAskOrder: Order) {
         // Process trades at each OrdersAtPrice list inside bids starting with the highest bidding price until the bidding price is lower than asking price
 
-        while ( (!bids.isEmpty()) && (newAskOrder.quantity > 0) && (newAskOrder.price <= bids.peek().price) ) {
+        while ((!bids.isEmpty()) && (newAskOrder.quantity > 0) && (newAskOrder.price <= bids.peek().price)) {
             val highestBids: ListOrdersAtPrice = asks.peek()
             highestBids.processTradesAskOrder(newAskOrder, this)
             // remove list if there are no more orders at this price.
@@ -63,11 +132,14 @@ class OrderBook(
         }
     }
 
-    private fun insertIntoOrderBook(newBidOrder: Order) {
+    /**
+     * Add [newOrder] to the order book.
+     */
+    private fun insertIntoOrderBook(newOrder: Order) {
         // search for the list of orders at the price of the new order = listAtPrice
         // add this newBidOrder to the listAtPrice list
-        var listAtPrice: ListOrdersAtPrice = getListAtPrice(newBidOrder)
-        listAtPrice.addOrder(newBidOrder)
+        val listAtPrice: ListOrdersAtPrice = getListAtPrice(newOrder)
+        listAtPrice.addOrder(newOrder)
     }
 
     /**
@@ -77,7 +149,7 @@ class OrderBook(
         // Search for a list with the price of the new order
         // if you can't find the list, create and return a new empty one
         var listPrice = listPriceMap[order.price]
-        if (listPrice != null){
+        if (listPrice != null) {
             return listPrice
         } else {
             listPrice = ListOrdersAtPrice(order.price)
