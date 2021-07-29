@@ -30,18 +30,18 @@ class ListOrdersAtPrice(
 
         while ((orders.size > 0) && (newBidOrder.quantity > 0)) {
             var newTrade: Trade;
-            val currentOrder = orders.peek()
-            if (newBidOrder.quantity < currentOrder.quantity) {
+            val currentAskOrder = orders.peek()
+            if (newBidOrder.quantity < currentAskOrder.quantity) {
                 /// quantity from seller is more than the buyer wants to buy
-                currentOrder.quantity -= newBidOrder.quantity
-                newTrade = Trade(buyer = newBidOrder, seller = currentOrder, quantity = newBidOrder.quantity)
+                currentAskOrder.quantity -= newBidOrder.quantity
+                newTrade = Trade(buyer = newBidOrder, seller = currentAskOrder, quantity = newBidOrder.quantity)
                 newBidOrder.fullfill(newTrade)
-                currentOrder.addTrade(newTrade)
+                currentAskOrder.addTrade(newTrade)
             } else {
                 // the quantity from seller is less than what the buyer wants to buy
-                newBidOrder.quantity -= currentOrder.quantity
-                newTrade = Trade(buyer = newBidOrder, seller = currentOrder, quantity = currentOrder.quantity)
-                currentOrder.fullfill(newTrade)
+                newBidOrder.quantity -= currentAskOrder.quantity
+                newTrade = Trade(buyer = newBidOrder, seller = currentAskOrder, quantity = currentAskOrder.quantity)
+                currentAskOrder.fullfill(newTrade)
                 newBidOrder.addTrade(newTrade)
                 // remove fullfillsed order from orderbook
                 orders.pop()
@@ -52,7 +52,28 @@ class ListOrdersAtPrice(
     }
 
     fun processTradesAskOrder(newAskOrder: Order, orderBook: OrderBook) {
-        TODO("Process trades for the new bid order with orders in this list at this price")
+
+        while ((orders.size > 0) && (newAskOrder.quantity > 0)) {
+            var newTrade: Trade;
+            val currentBidOrder = orders.peek()
+
+            if (newAskOrder.quantity < currentBidOrder.quantity) {
+                /// quantity from seller is LESS than the buyer wants to buy
+                newTrade = Trade(buyer = newAskOrder, seller = currentBidOrder, quantity = newAskOrder.quantity)
+                newAskOrder.fullfill(newTrade)
+                currentBidOrder.addTrade(newTrade)
+            } else {
+                // the quantity from seller is MORE than what the buyer wants to buy
+                newTrade = Trade(buyer = newAskOrder, seller = currentBidOrder, quantity = currentBidOrder.quantity)
+                currentBidOrder.fullfill(newTrade)
+                newAskOrder.addTrade(newTrade)
+                // remove fullfillsed order from orderbook
+                orders.pop()
+            }
+            // add trade to orderbook
+            orderBook.addTrade(newTrade)
+        }
+
     }
 
     fun getSize(): Int {
