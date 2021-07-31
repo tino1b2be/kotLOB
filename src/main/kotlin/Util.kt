@@ -1,4 +1,6 @@
 import org.json.JSONArray
+import org.json.JSONException
+import org.json.JSONObject
 import java.io.File
 import java.io.InputStream
 import java.util.*
@@ -30,6 +32,20 @@ class Util {
             }
 
             return ordersList
+        }
+
+        fun isJSONValid(test: String?): Boolean {
+            try {
+                JSONObject(test)
+            } catch (ex: JSONException) {
+                // e.g. in case JSONArray is valid as well...
+                try {
+                    JSONArray(test)
+                } catch (ex1: JSONException) {
+                    return false
+                }
+            }
+            return true
         }
     }
 

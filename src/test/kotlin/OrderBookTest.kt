@@ -29,7 +29,8 @@ class OrderBookTest {
         assert(orderBook.listPriceMap.isEmpty())
         assert(orderBook.sequence == 0)
         assert(orderBook.numOrders == 0)
-
+        assert(Util.isJSONValid(orderBook.getOrderBookJSON()))
+        assert(Util.isJSONValid(orderBook.getRecentTrades()))
     }
 
     @Test
@@ -49,6 +50,8 @@ class OrderBookTest {
         assert(orderBook.listPriceMap[111] == orderBook.bids.peek())
         assert(orderBook.numOrders == 1)
 
+        assert(Util.isJSONValid(orderBook.getOrderBookJSON()))
+        assert(Util.isJSONValid(orderBook.getRecentTrades()))
     }
 
     @Test
@@ -71,6 +74,8 @@ class OrderBookTest {
         assert(orderBook.listPriceMap[111] == orderBook.bids.peek())
         assert(orderBook.numOrders == 3)
 
+        assert(Util.isJSONValid(orderBook.getOrderBookJSON()))
+        assert(Util.isJSONValid(orderBook.getRecentTrades()))
     }
 
     @Test
@@ -90,6 +95,8 @@ class OrderBookTest {
         assert(orderBook.listPriceMap[111] == orderBook.asks.peek())
         assert(orderBook.numOrders == 1)
 
+        assert(Util.isJSONValid(orderBook.getOrderBookJSON()))
+        assert(Util.isJSONValid(orderBook.getRecentTrades()))
     }
 
     @Test
@@ -112,6 +119,8 @@ class OrderBookTest {
         assert(orderBook.listPriceMap[111] == orderBook.asks.peek())
         assert(orderBook.numOrders == 3)
 
+        assert(Util.isJSONValid(orderBook.getOrderBookJSON()))
+        assert(Util.isJSONValid(orderBook.getRecentTrades()))
     }
 
     @Test
@@ -142,6 +151,8 @@ class OrderBookTest {
         assert(bid.orderTrades[0].seller == ask)
         assert(bid.orderTrades[0].taker == OrderType.BID)
 
+        assert(Util.isJSONValid(orderBook.getOrderBookJSON()))
+        assert(Util.isJSONValid(orderBook.getRecentTrades()))
     }
 
     @Test
@@ -171,6 +182,8 @@ class OrderBookTest {
         assert(bid.orderTrades[0].seller == ask)
         assert(bid.orderTrades[0].taker == OrderType.ASK)
 
+        assert(Util.isJSONValid(orderBook.getOrderBookJSON()))
+        assert(Util.isJSONValid(orderBook.getRecentTrades()))
     }
 
     @Test
@@ -231,6 +244,8 @@ class OrderBookTest {
         assert(bid2.orderTrades[0].taker == OrderType.BID)
         assert(bid3.orderTrades[0].taker == OrderType.BID)
 
+        assert(Util.isJSONValid(orderBook.getOrderBookJSON()))
+        assert(Util.isJSONValid(orderBook.getRecentTrades()))
     }
 
     @Test
@@ -291,6 +306,8 @@ class OrderBookTest {
         assert(bid2.orderTrades[0].taker == OrderType.ASK)
         assert(bid3.orderTrades[0].taker == OrderType.ASK)
 
+        assert(Util.isJSONValid(orderBook.getOrderBookJSON()))
+        assert(Util.isJSONValid(orderBook.getRecentTrades()))
     }
 
     @Test
@@ -323,6 +340,8 @@ class OrderBookTest {
         assert(bid.orderTrades[0].seller == ask)
         assert(bid.orderTrades[0].taker == OrderType.ASK)
 
+        assert(Util.isJSONValid(orderBook.getOrderBookJSON()))
+        assert(Util.isJSONValid(orderBook.getRecentTrades()))
     }
 
     @Test
@@ -355,6 +374,8 @@ class OrderBookTest {
         assert(bid.orderTrades[0].seller == ask)
         assert(bid.orderTrades[0].taker == OrderType.BID)
 
+        assert(Util.isJSONValid(orderBook.getOrderBookJSON()))
+        assert(Util.isJSONValid(orderBook.getRecentTrades()))
     }
 
     @Test
@@ -387,6 +408,8 @@ class OrderBookTest {
         assert(bid.orderTrades[0].seller == ask)
         assert(bid.orderTrades[0].taker == OrderType.ASK)
 
+        assert(Util.isJSONValid(orderBook.getOrderBookJSON()))
+        assert(Util.isJSONValid(orderBook.getRecentTrades()))
     }
 
     @Test
@@ -447,6 +470,8 @@ class OrderBookTest {
         assert(bid2.orderTrades[0].taker == OrderType.ASK)
         assert(bid3.orderTrades[0].taker == OrderType.ASK)
 
+        assert(Util.isJSONValid(orderBook.getOrderBookJSON()))
+        assert(Util.isJSONValid(orderBook.getRecentTrades()))
     }
 
     @Test
@@ -507,6 +532,8 @@ class OrderBookTest {
         assert(bid2.orderTrades[0].taker == OrderType.BID)
         assert(bid3.orderTrades[0].taker == OrderType.BID)
 
+        assert(Util.isJSONValid(orderBook.getOrderBookJSON()))
+        assert(Util.isJSONValid(orderBook.getRecentTrades()))
     }
 
     @Test
@@ -559,6 +586,8 @@ class OrderBookTest {
         assert(bid2.orderTrades[0].taker == OrderType.BID)
         assert(bid3.orderTrades[0].taker == OrderType.BID)
 
+        assert(Util.isJSONValid(orderBook.getOrderBookJSON()))
+        assert(Util.isJSONValid(orderBook.getRecentTrades()))
     }
 
     @Test
@@ -611,6 +640,8 @@ class OrderBookTest {
         assert(ask2.orderTrades[0].taker == OrderType.ASK)
         assert(ask3.orderTrades[0].taker == OrderType.ASK)
 
+        assert(Util.isJSONValid(orderBook.getOrderBookJSON()))
+        assert(Util.isJSONValid(orderBook.getRecentTrades()))
     }
 
     @Test
@@ -663,6 +694,8 @@ class OrderBookTest {
         assert(bid2.orderTrades[0].taker == OrderType.ASK)
         assert(bid3.orderTrades[0].taker == OrderType.ASK)
 
+        assert(Util.isJSONValid(orderBook.getOrderBookJSON()))
+        assert(Util.isJSONValid(orderBook.getRecentTrades()))
     }
 
     @Test
@@ -715,6 +748,8 @@ class OrderBookTest {
         assert(bid2.orderTrades[0].taker == OrderType.BID)
         assert(bid3.orderTrades[0].taker == OrderType.BID)
 
+        assert(Util.isJSONValid(orderBook.getOrderBookJSON()))
+        assert(Util.isJSONValid(orderBook.getRecentTrades()))
     }
 
     @Test
@@ -767,6 +802,8 @@ class OrderBookTest {
         assert(bid2.orderTrades[0].taker == OrderType.ASK)
         assert(bid3.orderTrades[0].taker == OrderType.ASK)
 
+        assert(Util.isJSONValid(orderBook.getOrderBookJSON()))
+        assert(Util.isJSONValid(orderBook.getRecentTrades()))
     }
 
     @Test
@@ -819,37 +856,8 @@ class OrderBookTest {
         assert(bid2.orderTrades[0].taker == OrderType.BID)
         assert(bid3.orderTrades[0].taker == OrderType.BID)
 
-    }
-
-    @Test
-    fun testSmallBidAndAskTrades() {
-
-    }
-
-    @Test
-    fun testLargeBidAndAskTrades() {
-
-
-    }
-
-    @Test
-    fun testEmptyTradeHistory() {
-
-    }
-
-    @Test
-    fun testSmallTradeHistory() {
-
-    }
-
-    @Test
-    fun testMaxTradeHistory() {
-
-    }
-
-    @Test
-    fun isEmpty() {
-
+        assert(Util.isJSONValid(orderBook.getOrderBookJSON()))
+        assert(Util.isJSONValid(orderBook.getRecentTrades()))
     }
 
 }
