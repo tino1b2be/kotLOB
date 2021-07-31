@@ -1,0 +1,42 @@
+[
+  {
+    "side" : "ask",
+    "qty" : 1,
+    "price" : 112
+  },
+  {
+    "side" : "ask",
+    "qty" : 3,
+    "price" : 111
+  },
+  {
+  "side" : "ask",
+  "qty" : 7,
+  "price" : 113
+  },
+  {
+    "side" : "ask",
+    "qty" : 7,
+    "price" : 111
+  },
+  {
+    "side" : "bid",
+    "qty" : 5,
+    "price" : 109
+  },
+  {
+    "side" : "bid",
+    "qty" : 2,
+    "price" : 107
+  },
+  {
+    "side" : "bid",
+    "qty" : 8,
+    "price" : 108
+  },
+  {
+    "side" : "bid",
+    "qty" : 6,
+    "price" : 108
+  }
+]

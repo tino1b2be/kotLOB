@@ -17,8 +17,16 @@ class Order(
      * returns true if this order has been fulfilled
      */
     fun isFulfilled(): Boolean {
-        return quantity == 0
+        return quantity == 0 && orderTrades.isNotEmpty()
     }
+
+    /**
+     * returns true if this order has been fulfilled
+     */
+    fun isNotFulfilled(): Boolean {
+        return !isFulfilled()
+    }
+
 
     /**
      * add a [newTrade] for this order and deduct the order quantity
@@ -35,6 +43,10 @@ class Order(
     fun fulfill(newTrade: Trade) {
         quantity = 0
         addTrade(newTrade)
+    }
+
+    override fun toString(): String {
+        return "$type | qty=$quantity   | price=$price"
     }
 
 }

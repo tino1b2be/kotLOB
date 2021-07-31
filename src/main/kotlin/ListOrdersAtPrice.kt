@@ -42,7 +42,19 @@ class ListOrdersAtPrice(
         while ((orders.size > 0) && (newBidOrder.quantity > 0)) {
             var newTrade: Trade
             val currentAskOrder = orders.peek()
-            if (newBidOrder.quantity < currentAskOrder.quantity) {
+            if (newBidOrder.quantity == currentAskOrder.quantity) {
+                /// quantity from seller is the same the buyer wants to buy
+                quantityTotal -= newBidOrder.quantity
+                newTrade = Trade(
+                    buyer = newBidOrder,
+                    seller = currentAskOrder,
+                    quantity = newBidOrder.quantity,
+                    OrderType.BID,
+                    sequence = orderBook.sequence++
+                )
+                newBidOrder.fulfill(newTrade)
+                currentAskOrder.fulfill(newTrade)
+            } else if (newBidOrder.quantity < currentAskOrder.quantity) {
                 /// quantity from seller is more than the buyer wants to buy
                 quantityTotal -= newBidOrder.quantity
                 newTrade = Trade(

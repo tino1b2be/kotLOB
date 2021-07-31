@@ -15,7 +15,8 @@ class OrderBook(
     // a Map to quickly search for the listOrdersAtPrice
     var listPriceMap: HashMap<Int, ListOrdersAtPrice> = HashMap(),
     var lastUpdateTime: Date = Calendar.getInstance().time,
-    var sequence: Int = 0
+    var sequence: Int = 0,
+    var numOrders: Int = 0
 ) {
 
     /**
@@ -103,7 +104,7 @@ class OrderBook(
         if (newLimitOrder.quantity > 0) {
             insertIntoOrderBook(newLimitOrder)
         }
-
+        numOrders++
     }
 
     /**
@@ -116,7 +117,10 @@ class OrderBook(
             val lowestAsks: ListOrdersAtPrice = asks.peek()
             lowestAsks.processTradesBidOrder(newBidOrder, this)
             // remove list if there are no more orders at this price.
-            if (lowestAsks.getSize() == 0) asks.poll()
+            if (lowestAsks.getSize() == 0) {
+                asks.poll()
+                listPriceMap.remove(lowestAsks.price)
+            }
         }
 
     }
@@ -131,7 +135,10 @@ class OrderBook(
             val highestBids: ListOrdersAtPrice = asks.peek()
             highestBids.processTradesAskOrder(newAskOrder, this)
             // remove list if there are no more orders at this price.
-            if (highestBids.getSize() == 0) asks.poll()
+            if (highestBids.getSize() == 0) {
+                asks.poll()
+                listPriceMap.remove(highestBids.price)
+            }
         }
     }
 
