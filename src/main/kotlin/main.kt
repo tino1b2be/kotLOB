@@ -1,13 +1,11 @@
-import javax.management.InvalidAttributeValueException
-
 fun main() {
 
-    var orderbook = OrderBook();
-    var sampleOrders = Util.loadOrdersFromJsonFile("src/sample_orders.json")
+    val orderBook = OrderBook()
+    val sampleOrders = Util.loadOrdersFromJsonFile("src/sample_orders.json")
 
     // add sample orders
     for ( order in sampleOrders){
-        orderbook.processLimitOrder(order)
+        orderBook.processLimitOrder(order)
     }
     println("Welcome to the KotLOB limit order book interactive CLI")
 
@@ -18,20 +16,18 @@ fun main() {
         println("2. Add new limit order")
         println("3. Recent trades JSON")
         print("What is your option ( type 1, 2 or 3 ) ? : ")
-        val option = Integer.valueOf(readLine())
 
-        when (option) {
+        when (Integer.valueOf(readLine())) {
             1 -> { // print order book
-                println(orderbook.getOrderBookJSON())
+                println(orderBook.getOrderBookJSON())
             }
             2 -> { // Add new limit order
                 print("Order type (enter \"bid\" or \"ask\") : ")
                 val typeString = readLine()
-                val type: OrderType
-                if (typeString == "bid") {
-                    type = OrderType.BID
+                val type: OrderType = if (typeString == "bid") {
+                    OrderType.BID
                 } else if (typeString == "ask") {
-                    type = OrderType.ASK
+                    OrderType.ASK
                 } else {
                     println("Invalid input. Try again.")
                     continue
@@ -51,7 +47,7 @@ fun main() {
 
                 val order = Order(price = price, quantity = qty, type = type)
 
-                orderbook.processLimitOrder(order)
+                orderBook.processLimitOrder(order)
 
                 when {
                     order.isFulfilled() -> {
@@ -72,7 +68,7 @@ fun main() {
                 }
             }
             3 -> {
-                println(orderbook.getRecentTrades())
+                println(orderBook.getRecentTrades())
             }
             else -> {
                 println("Invalid input. try again")

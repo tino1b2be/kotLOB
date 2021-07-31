@@ -27,20 +27,6 @@ class OrderBook(
         trades.add(trade)
     }
 
-    /**
-     * Get all trades
-     */
-    fun getAllOrders() {
-        TODO("return a linkedList with n prices from order book")
-    }
-
-    /**
-     *  get the most recent [num] trades
-     */
-    fun getOrders(num: Int): LinkedList<ListOrdersAtPrice> {
-        TODO("return a linkedList with n prices from order book")
-    }
-
     fun getRecentTrades(): String {
         return getRecentTrades(20)
     }
