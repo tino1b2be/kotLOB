@@ -132,11 +132,11 @@ class OrderBook(
         // Process trades at each OrdersAtPrice list inside bids starting with the highest bidding price until the bidding price is lower than asking price
 
         while ((!bids.isEmpty()) && (newAskOrder.quantity > 0) && (newAskOrder.price <= bids.peek().price)) {
-            val highestBids: ListOrdersAtPrice = asks.peek()
+            val highestBids: ListOrdersAtPrice = bids.peek()
             highestBids.processTradesAskOrder(newAskOrder, this)
             // remove list if there are no more orders at this price.
             if (highestBids.getSize() == 0) {
-                asks.poll()
+                bids.poll()
                 listPriceMap.remove(highestBids.price)
             }
         }

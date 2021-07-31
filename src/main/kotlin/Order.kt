@@ -10,7 +10,7 @@ class Order(
     val timestamp: Date = Calendar.getInstance().time,
     val id: UUID = UUID.randomUUID(),
     // arraylist to store all trades that happen in the order book
-    private var orderTrades: ArrayList<Trade> = ArrayList<Trade>()
+    var orderTrades: ArrayList<Trade> = ArrayList<Trade>()
 ) {
 
     /**
@@ -42,7 +42,7 @@ class Order(
      */
     fun fulfill(newTrade: Trade) {
         quantity = 0
-        addTrade(newTrade)
+        orderTrades.add(newTrade)
     }
 
     override fun toString(): String {

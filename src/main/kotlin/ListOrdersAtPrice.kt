@@ -42,44 +42,49 @@ class ListOrdersAtPrice(
         while ((orders.size > 0) && (newBidOrder.quantity > 0)) {
             var newTrade: Trade
             val currentAskOrder = orders.peek()
-            if (newBidOrder.quantity == currentAskOrder.quantity) {
-                /// quantity from seller is the same the buyer wants to buy
-                quantityTotal -= newBidOrder.quantity
-                newTrade = Trade(
-                    buyer = newBidOrder,
-                    seller = currentAskOrder,
-                    quantity = newBidOrder.quantity,
-                    OrderType.BID,
-                    sequence = orderBook.sequence++
-                )
-                newBidOrder.fulfill(newTrade)
-                currentAskOrder.fulfill(newTrade)
-            } else if (newBidOrder.quantity < currentAskOrder.quantity) {
-                /// quantity from seller is more than the buyer wants to buy
-                quantityTotal -= newBidOrder.quantity
-                newTrade = Trade(
-                    buyer = newBidOrder,
-                    seller = currentAskOrder,
-                    quantity = newBidOrder.quantity,
-                    OrderType.BID,
-                    sequence = orderBook.sequence++
-                )
-                newBidOrder.fulfill(newTrade)
-                currentAskOrder.addTrade(newTrade)
-            } else {
-                // the quantity from seller is less than what the buyer wants to buy
-                quantityTotal -= currentAskOrder.quantity
-                newTrade = Trade(
-                    buyer = newBidOrder,
-                    seller = currentAskOrder,
-                    quantity = currentAskOrder.quantity,
-                    OrderType.BID,
-                    sequence = orderBook.sequence++
-                )
-                currentAskOrder.fulfill(newTrade)
-                newBidOrder.addTrade(newTrade)
-                // remove fulfilled order from order book
-                orders.pop()
+            when {
+                newBidOrder.quantity == currentAskOrder.quantity -> {
+                    /// quantity from seller is the same the buyer wants to buy
+                    quantityTotal -= newBidOrder.quantity
+                    newTrade = Trade(
+                        buyer = newBidOrder,
+                        seller = currentAskOrder,
+                        quantity = newBidOrder.quantity,
+                        OrderType.BID,
+                        sequence = orderBook.sequence++
+                    )
+                    newBidOrder.fulfill(newTrade)
+                    currentAskOrder.fulfill(newTrade)
+                    orders.pop() // remove fulfilled order
+                }
+                newBidOrder.quantity < currentAskOrder.quantity -> {
+                    /// quantity from seller is more than the buyer wants to buy
+                    quantityTotal -= newBidOrder.quantity
+                    newTrade = Trade(
+                        buyer = newBidOrder,
+                        seller = currentAskOrder,
+                        quantity = newBidOrder.quantity,
+                        OrderType.BID,
+                        sequence = orderBook.sequence++
+                    )
+                    newBidOrder.fulfill(newTrade)
+                    currentAskOrder.addTrade(newTrade)
+                }
+                else -> {
+                    // the quantity from seller is less than what the buyer wants to buy
+                    quantityTotal -= currentAskOrder.quantity
+                    newTrade = Trade(
+                        buyer = newBidOrder,
+                        seller = currentAskOrder,
+                        quantity = currentAskOrder.quantity,
+                        OrderType.BID,
+                        sequence = orderBook.sequence++
+                    )
+                    currentAskOrder.fulfill(newTrade)
+                    newBidOrder.addTrade(newTrade)
+                    // remove fulfilled order from order book
+                    orders.pop()
+                }
             }
             orderBook.addTrade(newTrade)
         }
@@ -96,32 +101,49 @@ class ListOrdersAtPrice(
             var newTrade: Trade
             val currentBidOrder = orders.peek()
 
-            if (newAskOrder.quantity < currentBidOrder.quantity) {
-                /// quantity from seller is LESS than the buyer wants to buy
-                quantityTotal -= newAskOrder.quantity
-                newTrade = Trade(
-                    buyer = newAskOrder,
-                    seller = currentBidOrder,
-                    quantity = newAskOrder.quantity,
-                    OrderType.ASK,
-                    sequence = orderBook.sequence++
-                )
-                newAskOrder.fulfill(newTrade)
-                currentBidOrder.addTrade(newTrade)
-            } else {
-                // the quantity from seller is MORE than what the buyer wants to buy
-                quantityTotal -= currentBidOrder.quantity
-                newTrade = Trade(
-                    buyer = newAskOrder,
-                    seller = currentBidOrder,
-                    quantity = currentBidOrder.quantity,
-                    OrderType.ASK,
-                    sequence = orderBook.sequence++
-                )
-                currentBidOrder.fulfill(newTrade)
-                newAskOrder.addTrade(newTrade)
-                // remove fulfilled order from order book
-                orders.pop()
+            when {
+                newAskOrder.quantity == currentBidOrder.quantity -> {
+                    // quantity from seller is LESS than the buyer wants to buy
+                    quantityTotal -= newAskOrder.quantity
+                    newTrade = Trade(
+                        buyer = currentBidOrder,
+                        seller = newAskOrder,
+                        quantity = newAskOrder.quantity,
+                        OrderType.ASK,
+                        sequence = orderBook.sequence++
+                    )
+                    newAskOrder.fulfill(newTrade)
+                    currentBidOrder.fulfill(newTrade)
+                    orders.pop() // remove fulfilled order
+                }
+                newAskOrder.quantity < currentBidOrder.quantity -> {
+                    /// quantity from seller is LESS than the buyer wants to buy
+                    quantityTotal -= newAskOrder.quantity
+                    newTrade = Trade(
+                        buyer = currentBidOrder,
+                        seller = newAskOrder,
+                        quantity = newAskOrder.quantity,
+                        OrderType.ASK,
+                        sequence = orderBook.sequence++
+                    )
+                    newAskOrder.fulfill(newTrade)
+                    currentBidOrder.addTrade(newTrade)
+                }
+                else -> {
+                    // the quantity from seller is MORE than what the buyer wants to buy
+                    quantityTotal -= currentBidOrder.quantity
+                    newTrade = Trade(
+                        buyer = currentBidOrder,
+                        seller = newAskOrder,
+                        quantity = currentBidOrder.quantity,
+                        OrderType.ASK,
+                        sequence = orderBook.sequence++
+                    )
+                    currentBidOrder.fulfill(newTrade)
+                    newAskOrder.addTrade(newTrade)
+                    // remove fulfilled order from order book
+                    orders.pop()
+                }
             }
             // add trade to order book
             orderBook.addTrade(newTrade)

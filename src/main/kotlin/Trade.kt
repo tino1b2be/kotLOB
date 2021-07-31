@@ -16,7 +16,7 @@ class Trade(
     /**
      * returns a JSON formatted string representation of the trade
      */
-    override fun toString(): String {
+    fun toJSONString(): String {
         var takerString: String = if (taker == OrderType.ASK) "ask" else "buy"
         return "{\n" +
                 "'price':'${buyer.price}',\n" +
@@ -26,5 +26,12 @@ class Trade(
                 "'sequenceId':$sequence,\n" +
                 "'id':'$id',\n" +
                 "}"
+    }
+
+    /**
+     * Return a summary of the trade
+     */
+    override fun toString(): String {
+        return "$taker | price=${buyer.price}   | qty=$quantity | seq=$sequence"
     }
 }
