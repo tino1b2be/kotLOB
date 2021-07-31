@@ -117,7 +117,7 @@ class OrderBookTest {
     }
 
     @Test
-    fun testTradeEqualOrdersAskFirst() {
+    fun testSingleTradeEqualPricesOrdersAskFirst() {
 
         val orderBook = OrderBook()
         val ask = Order(price = 111, quantity = 9, type = OrderType.ASK)
@@ -147,7 +147,7 @@ class OrderBookTest {
     }
 
     @Test
-    fun testTradeEqualOrdersBidFirst() {
+    fun testSingleTradeEqualPricesOrdersBidFirst() {
         val orderBook = OrderBook()
         val ask = Order(price = 111, quantity = 9, type = OrderType.ASK)
         val bid = Order(price = 111, quantity = 9, type = OrderType.BID)
@@ -172,6 +172,190 @@ class OrderBookTest {
         assert(bid.orderTrades[0].buyer == bid)
         assert(bid.orderTrades[0].seller == ask)
         assert(bid.orderTrades[0].taker == OrderType.ASK)
+
+    }
+
+    @Test
+    fun testMultipleTradeEqualPricesOrdersAsksFirst() {
+
+        val orderBook = OrderBook()
+
+        val ask1 = Order(price = 111, quantity = 9, type = OrderType.ASK)
+        val ask2 = Order(price = 111, quantity = 9, type = OrderType.ASK)
+        val ask3 = Order(price = 111, quantity = 9, type = OrderType.ASK)
+
+        val bid1 = Order(price = 111, quantity = 9, type = OrderType.BID)
+        val bid2 = Order(price = 111, quantity = 9, type = OrderType.BID)
+        val bid3 = Order(price = 111, quantity = 9, type = OrderType.BID)
+
+        orderBook.processLimitOrder(ask1)
+        orderBook.processLimitOrder(ask2)
+        orderBook.processLimitOrder(ask3)
+
+        orderBook.processLimitOrder(bid1)
+        orderBook.processLimitOrder(bid2)
+        orderBook.processLimitOrder(bid3)
+
+        assert(ask1.isFulfilled())
+        assert(ask2.isFulfilled())
+        assert(ask3.isFulfilled())
+        assert(bid1.isFulfilled())
+        assert(bid2.isFulfilled())
+        assert(bid3.isFulfilled())
+
+        assert(orderBook.isEmpty())
+        assert(orderBook.asks.isEmpty())
+        assert(orderBook.bids.isEmpty())
+        assert(orderBook.trades.size == 3)
+        assert(orderBook.listPriceMap.isEmpty())
+        assert(orderBook.sequence == 3)
+        assert(orderBook.numOrders == 6)
+
+        assert(ask1.quantity == 0)
+        assert(ask2.quantity == 0)
+        assert(ask3.quantity == 0)
+        assert(bid1.quantity == 0)
+        assert(bid2.quantity == 0)
+        assert(bid3.quantity == 0)
+        assert(bid1.orderTrades[0] == ask1.orderTrades[0] && bid1.orderTrades[0] == orderBook.trades[0])
+        assert(bid2.orderTrades[0] == ask2.orderTrades[0] && bid2.orderTrades[0] == orderBook.trades[1])
+        assert(bid3.orderTrades[0] == ask3.orderTrades[0] && bid3.orderTrades[0] == orderBook.trades[2])
+        assert(bid1.orderTrades[0].quantity == 9)
+        assert(bid2.orderTrades[0].quantity == 9)
+        assert(bid3.orderTrades[0].quantity == 9)
+        assert(bid1.orderTrades[0].buyer == bid1)
+        assert(bid2.orderTrades[0].buyer == bid2)
+        assert(bid3.orderTrades[0].buyer == bid3)
+        assert(bid1.orderTrades[0].seller == ask1)
+        assert(bid2.orderTrades[0].seller == ask2)
+        assert(bid3.orderTrades[0].seller == ask3)
+        assert(bid1.orderTrades[0].taker == OrderType.BID)
+        assert(bid2.orderTrades[0].taker == OrderType.BID)
+        assert(bid3.orderTrades[0].taker == OrderType.BID)
+
+    }
+
+    @Test
+    fun testMultipleTradeEqualPricesOrdersBidsFirst() {
+
+        val orderBook = OrderBook()
+
+        val ask1 = Order(price = 111, quantity = 9, type = OrderType.ASK)
+        val ask2 = Order(price = 111, quantity = 9, type = OrderType.ASK)
+        val ask3 = Order(price = 111, quantity = 9, type = OrderType.ASK)
+
+        val bid1 = Order(price = 111, quantity = 9, type = OrderType.BID)
+        val bid2 = Order(price = 111, quantity = 9, type = OrderType.BID)
+        val bid3 = Order(price = 111, quantity = 9, type = OrderType.BID)
+
+        orderBook.processLimitOrder(bid1)
+        orderBook.processLimitOrder(bid2)
+        orderBook.processLimitOrder(bid3)
+
+        orderBook.processLimitOrder(ask1)
+        orderBook.processLimitOrder(ask2)
+        orderBook.processLimitOrder(ask3)
+
+        assert(ask1.isFulfilled())
+        assert(ask2.isFulfilled())
+        assert(ask3.isFulfilled())
+        assert(bid1.isFulfilled())
+        assert(bid2.isFulfilled())
+        assert(bid3.isFulfilled())
+
+        assert(orderBook.isEmpty())
+        assert(orderBook.asks.isEmpty())
+        assert(orderBook.bids.isEmpty())
+        assert(orderBook.trades.size == 3)
+        assert(orderBook.listPriceMap.isEmpty())
+        assert(orderBook.sequence == 3)
+        assert(orderBook.numOrders == 6)
+
+        assert(ask1.quantity == 0)
+        assert(ask2.quantity == 0)
+        assert(ask3.quantity == 0)
+        assert(bid1.quantity == 0)
+        assert(bid2.quantity == 0)
+        assert(bid3.quantity == 0)
+        assert(bid1.orderTrades[0] == ask1.orderTrades[0] && bid1.orderTrades[0] == orderBook.trades[0])
+        assert(bid2.orderTrades[0] == ask2.orderTrades[0] && bid2.orderTrades[0] == orderBook.trades[1])
+        assert(bid3.orderTrades[0] == ask3.orderTrades[0] && bid3.orderTrades[0] == orderBook.trades[2])
+        assert(bid1.orderTrades[0].quantity == 9)
+        assert(bid2.orderTrades[0].quantity == 9)
+        assert(bid3.orderTrades[0].quantity == 9)
+        assert(bid1.orderTrades[0].buyer == bid1)
+        assert(bid2.orderTrades[0].buyer == bid2)
+        assert(bid3.orderTrades[0].buyer == bid3)
+        assert(bid1.orderTrades[0].seller == ask1)
+        assert(bid2.orderTrades[0].seller == ask2)
+        assert(bid3.orderTrades[0].seller == ask3)
+        assert(bid1.orderTrades[0].taker == OrderType.ASK)
+        assert(bid2.orderTrades[0].taker == OrderType.ASK)
+        assert(bid3.orderTrades[0].taker == OrderType.ASK)
+
+    }
+
+    @Test
+    fun testSingleTradeHigherBidQuantityEqualPricesBidFirst() {
+
+        val orderBook = OrderBook()
+
+        val ask = Order(price = 111, quantity = 9, type = OrderType.ASK)
+        val bid = Order(price = 111, quantity = 6, type = OrderType.BID)
+
+        orderBook.processLimitOrder(bid)
+        orderBook.processLimitOrder(ask)
+
+        assert(ask.isNotFulfilled())
+        assert(bid.isFulfilled())
+
+        assert(!orderBook.isEmpty())
+        assert(orderBook.asks.size == 1)
+        assert(orderBook.bids.isEmpty())
+        assert(orderBook.trades.size == 1)
+        assert(orderBook.listPriceMap.size == 1)
+        assert(orderBook.sequence == 1)
+        assert(orderBook.numOrders == 2)
+
+        assert(ask.quantity == 3)
+        assert(bid.quantity == 0)
+        assert(bid.orderTrades[0] == ask.orderTrades[0] && bid.orderTrades[0] == orderBook.trades[0])
+        assert(bid.orderTrades[0].quantity == 6)
+        assert(bid.orderTrades[0].buyer == bid)
+        assert(bid.orderTrades[0].seller == ask)
+        assert(bid.orderTrades[0].taker == OrderType.ASK)
+
+    }
+
+    @Test
+    fun testSingleTradeHigherBidQuantityEqualPricesAskFirst() {
+
+        val orderBook = OrderBook()
+
+        val ask = Order(price = 111, quantity = 9, type = OrderType.ASK)
+        val bid = Order(price = 111, quantity = 6, type = OrderType.BID)
+
+        orderBook.processLimitOrder(ask)
+        orderBook.processLimitOrder(bid)
+
+        assert(ask.isNotFulfilled())
+        assert(bid.isFulfilled())
+
+        assert(!orderBook.isEmpty())
+        assert(orderBook.asks.size == 1)
+        assert(orderBook.bids.isEmpty())
+        assert(orderBook.trades.size == 1)
+        assert(orderBook.listPriceMap.size == 1)
+        assert(orderBook.sequence == 1)
+        assert(orderBook.numOrders == 2)
+
+        assert(ask.quantity == 3)
+        assert(bid.quantity == 0)
+        assert(bid.orderTrades[0] == ask.orderTrades[0] && bid.orderTrades[0] == orderBook.trades[0])
+        assert(bid.orderTrades[0].quantity == 6)
+        assert(bid.orderTrades[0].buyer == bid)
+        assert(bid.orderTrades[0].seller == ask)
+        assert(bid.orderTrades[0].taker == OrderType.BID)
 
     }
 
