@@ -10,6 +10,7 @@ class OrderBook(
     var asks: PriorityQueue<ListOrdersAtPrice> = PriorityQueue<ListOrdersAtPrice>(),
     // priority queue with highest bidding price at top TODO("could possibly optimise bids")
     var bids: PriorityQueue<ListOrdersAtPrice> = PriorityQueue<ListOrdersAtPrice>(Collections.reverseOrder()),
+
     // arraylist to store all trades that happen in the order book TODO("could possibly optimise trades list")
     var trades: ArrayList<Trade> = ArrayList<Trade>(),
     // a Map to quickly search for the listOrdersAtPrice

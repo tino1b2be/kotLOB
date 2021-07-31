@@ -1,11 +1,12 @@
 import java.util.*
+import kotlin.Comparator
 
 /**
  * Stores a list or orders for a given price and order type/side
  */
 class ListOrdersAtPrice(
     val price: Int
-) : Comparable<ListOrdersAtPrice> {
+) : Comparable<ListOrdersAtPrice>  {
 
     var orders: LinkedList<Order> = LinkedList<Order>()
     var quantityTotal: Int = 0
@@ -23,7 +24,9 @@ class ListOrdersAtPrice(
 //        This compareTo class is used for the PriorityQueue implementation
 //        to allow us to compare the prices or orders in this class with other
 //        price tiers.
-        return this.orders.peek().price - other.orders.peek().price
+
+        return this.price.compareTo(other.price)
+
     }
 
     operator fun get(i: Int): Order {
@@ -154,4 +157,9 @@ class ListOrdersAtPrice(
     fun getSize(): Int {
         return orders.size
     }
+
+    override fun toString(): String {
+        return "price:$price    | qty:$quantityTotal    | numOrders:${orders.size}"
+    }
+
 }
