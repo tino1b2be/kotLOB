@@ -41,12 +41,38 @@ class OrderBook(
         TODO("return a linkedList with n prices from order book")
     }
 
+    fun getRecentTrades(): String {
+        getRecentTrades(20)
+    }
+
+    fun getRecentTrades(num: Int): String {
+
+        var returnString = "[\n  "
+
+        for ((index, trade) in trades.withIndex()) {
+            var tradeString = "  {\n" +
+                    "    \"price\":\"${trade.price}\"," +
+                    "    \"quantity\":\"${trade.quantity}\"," +
+                    "    \"tradedAt\":\"${trade.timestamp}\"," +
+                    "    \"takerSide\":\"${trade.taker}\"," +
+                    "    \"sequence\":\"${trade.sequence}\"," +
+                    "    \"id\":\"${trade.id}\"," +
+                    "}"
+            if (index < num && index < trades.size) tradeString = "$tradeString," // add comma
+            returnString = "$returnString $tradeString"
+            if (index >= num) break
+        }
+
+        returnString = "$returnString\n]"
+        return returnString
+
+    }
+
     /**
      * Return JSON formatted string of the top [num] bids and [num] asks from the order book
      */
     fun getOrderBookJSON(num: Int): String {
 
-        var count = 0
         var returnString = "{\n \"Asks\":[\n  "
         // get top [num] asks
         for ((index, listOfOrders) in asks.withIndex()) {
@@ -106,6 +132,7 @@ class OrderBook(
             insertIntoOrderBook(newLimitOrder)
         }
         numOrders++
+        lastUpdateTime = Calendar.getInstance().time
     }
 
     /**
