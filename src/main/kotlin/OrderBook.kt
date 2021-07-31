@@ -42,7 +42,7 @@ class OrderBook(
     }
 
     fun getRecentTrades(): String {
-        getRecentTrades(20)
+        return getRecentTrades(20)
     }
 
     fun getRecentTrades(num: Int): String {
@@ -51,13 +51,13 @@ class OrderBook(
 
         for ((index, trade) in trades.withIndex()) {
             var tradeString = "  {\n" +
-                    "    \"price\":\"${trade.price}\"," +
-                    "    \"quantity\":\"${trade.quantity}\"," +
-                    "    \"tradedAt\":\"${trade.timestamp}\"," +
-                    "    \"takerSide\":\"${trade.taker}\"," +
-                    "    \"sequence\":\"${trade.sequence}\"," +
-                    "    \"id\":\"${trade.id}\"," +
-                    "}"
+                    "    \"price\":\"${trade.price}\",\n" +
+                    "    \"quantity\":\"${trade.quantity}\",\n" +
+                    "    \"tradedAt\":\"${trade.timestamp}\",\n" +
+                    "    \"takerSide\":\"${trade.taker}\",\n" +
+                    "    \"sequence\":\"${trade.sequence}\",\n" +
+                    "    \"id\":\"${trade.id}\"\n" +
+                    "}\n"
             if (index < num && index < trades.size) tradeString = "$tradeString," // add comma
             returnString = "$returnString $tradeString"
             if (index >= num) break
@@ -81,9 +81,9 @@ class OrderBook(
                     "   \"quantity\":\"${listOfOrders.quantityTotal}\",\n" +
                     "   \"price\":\"${listOfOrders.price}\",\n" +
                     "   \"orderCount\":${listOfOrders.getSize()}\n" +
-                    "}"
+                    "    }"
 
-            if (index < num && index < asks.size) listString = "$listString," // add comma
+            if (index < num && index < asks.size - 1) listString = "$listString," // add comma
             returnString = "$returnString $listString"
             if (index >= num) break
         }
@@ -99,12 +99,12 @@ class OrderBook(
                     "   \"orderCount\":${listOfOrders.getSize()}\n" +
                     "}"
 
-            if (index < num && index < bids.size) listString = "$listString," // add comma
+            if (index < num && index < bids.size - 1) listString = "$listString," // add comma
             returnString = "$returnString $listString" // append orders to string
             if (index >= num) break
         }
         // TODO format the date to ISO 8601
-        returnString = "$returnString \n  ],  \"LastChange\": \"$lastUpdateTime\"\n}"
+        returnString = "$returnString \n  ],\n  \"LastChange\": \"$lastUpdateTime\"\n}"
 
         return returnString
     }
