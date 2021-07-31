@@ -54,7 +54,8 @@ class ListOrdersAtPrice(
                         seller = currentAskOrder,
                         quantity = newBidOrder.quantity,
                         OrderType.BID,
-                        sequence = orderBook.sequence++
+                        sequence = orderBook.sequence++,
+                        price = currentAskOrder.price
                     )
                     newBidOrder.fulfill(newTrade)
                     currentAskOrder.fulfill(newTrade)
@@ -68,7 +69,8 @@ class ListOrdersAtPrice(
                         seller = currentAskOrder,
                         quantity = newBidOrder.quantity,
                         OrderType.BID,
-                        sequence = orderBook.sequence++
+                        sequence = orderBook.sequence++,
+                        price = currentAskOrder.price
                     )
                     newBidOrder.fulfill(newTrade)
                     currentAskOrder.addTrade(newTrade)
@@ -81,7 +83,8 @@ class ListOrdersAtPrice(
                         seller = currentAskOrder,
                         quantity = currentAskOrder.quantity,
                         OrderType.BID,
-                        sequence = orderBook.sequence++
+                        sequence = orderBook.sequence++,
+                        price = currentAskOrder.price
                     )
                     currentAskOrder.fulfill(newTrade)
                     newBidOrder.addTrade(newTrade)
@@ -113,7 +116,8 @@ class ListOrdersAtPrice(
                         seller = newAskOrder,
                         quantity = newAskOrder.quantity,
                         OrderType.ASK,
-                        sequence = orderBook.sequence++
+                        sequence = orderBook.sequence++,
+                        price = currentBidOrder.price
                     )
                     newAskOrder.fulfill(newTrade)
                     currentBidOrder.fulfill(newTrade)
@@ -127,7 +131,8 @@ class ListOrdersAtPrice(
                         seller = newAskOrder,
                         quantity = newAskOrder.quantity,
                         OrderType.ASK,
-                        sequence = orderBook.sequence++
+                        sequence = orderBook.sequence++,
+                        price = currentBidOrder.price
                     )
                     newAskOrder.fulfill(newTrade)
                     currentBidOrder.addTrade(newTrade)
@@ -140,7 +145,8 @@ class ListOrdersAtPrice(
                         seller = newAskOrder,
                         quantity = currentBidOrder.quantity,
                         OrderType.ASK,
-                        sequence = orderBook.sequence++
+                        sequence = orderBook.sequence++,
+                        price = currentBidOrder.price
                     )
                     currentBidOrder.fulfill(newTrade)
                     newAskOrder.addTrade(newTrade)

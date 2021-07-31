@@ -9,6 +9,7 @@ class Trade(
     var quantity: Int,
     val taker: OrderType,
     val sequence: Int,
+    val price: Int,
     var id: UUID = UUID.randomUUID(),
     var timestamp: Date = Calendar.getInstance().time
 ) {
@@ -19,7 +20,7 @@ class Trade(
     fun toJSONString(): String {
         var takerString: String = if (taker == OrderType.ASK) "ask" else "buy"
         return "{\n" +
-                "'price':'${buyer.price}',\n" +
+                "'price':'${price}',\n" +
                 "'quantity':'$quantity',\n" +
                 "'tradedAt':'$timestamp',\n" +
                 "'takerSide':'$takerString',\n" +
@@ -32,6 +33,6 @@ class Trade(
      * Return a summary of the trade
      */
     override fun toString(): String {
-        return "$taker | price=${buyer.price}   | qty=$quantity | seq=$sequence"
+        return "$taker | price=${price}   | qty=$quantity | seq=$sequence"
     }
 }

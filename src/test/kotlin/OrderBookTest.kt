@@ -2,8 +2,6 @@ import org.junit.Test
 
 class OrderBookTest {
 
-    var sampleOrders = Util.loadOrdersFromJsonFile("src/sample_orders.json")
-
     @Test
     fun testCreateOrder() {
         val bidOrder = Order(price = 111, quantity = 9, type = OrderType.BID)
@@ -452,7 +450,374 @@ class OrderBookTest {
     }
 
     @Test
-    fun testLargeBidTrade() {
+    fun testMultipleTradesDiffPricesOrdersAsksFirst() {
+
+        val orderBook = OrderBook()
+
+        val ask1 = Order(price = 111, quantity = 9, type = OrderType.ASK)
+        val ask2 = Order(price = 113, quantity = 9, type = OrderType.ASK)
+        val ask3 = Order(price = 112, quantity = 9, type = OrderType.ASK)
+
+        val bid1 = Order(price = 115, quantity = 9, type = OrderType.BID)
+        val bid2 = Order(price = 117, quantity = 9, type = OrderType.BID)
+        val bid3 = Order(price = 116, quantity = 9, type = OrderType.BID)
+
+        orderBook.processLimitOrder(ask1)
+        orderBook.processLimitOrder(ask2)
+        orderBook.processLimitOrder(ask3)
+
+        orderBook.processLimitOrder(bid1)
+        orderBook.processLimitOrder(bid2)
+        orderBook.processLimitOrder(bid3)
+
+        assert(ask1.isFulfilled())
+        assert(ask2.isFulfilled())
+        assert(ask3.isFulfilled())
+        assert(bid1.isFulfilled())
+        assert(bid2.isFulfilled())
+        assert(bid3.isFulfilled())
+
+        assert(orderBook.isEmpty())
+        assert(orderBook.asks.isEmpty())
+        assert(orderBook.bids.isEmpty())
+        assert(orderBook.trades.size == 3)
+        assert(orderBook.listPriceMap.isEmpty())
+        assert(orderBook.sequence == 3)
+        assert(orderBook.numOrders == 6)
+
+        assert(ask1.quantity == 0)
+        assert(ask2.quantity == 0)
+        assert(ask3.quantity == 0)
+        assert(bid1.quantity == 0)
+        assert(bid2.quantity == 0)
+        assert(bid3.quantity == 0)
+        assert(bid2.orderTrades[0] == ask3.orderTrades[0])
+        assert(bid3.orderTrades[0] == ask2.orderTrades[0])
+        assert(bid1.orderTrades[0] == ask1.orderTrades[0])
+        assert(bid1.orderTrades[0].quantity == 9)
+        assert(bid2.orderTrades[0].quantity == 9)
+        assert(bid3.orderTrades[0].quantity == 9)
+        assert(bid1.orderTrades[0].buyer == bid1)
+        assert(bid2.orderTrades[0].buyer == bid2)
+        assert(bid3.orderTrades[0].buyer == bid3)
+        assert(bid2.orderTrades[0].seller == ask3)
+        assert(bid3.orderTrades[0].seller == ask2)
+        assert(bid1.orderTrades[0].seller == ask1)
+        assert(bid1.orderTrades[0].taker == OrderType.BID)
+        assert(bid2.orderTrades[0].taker == OrderType.BID)
+        assert(bid3.orderTrades[0].taker == OrderType.BID)
+
+    }
+
+    @Test
+    fun testLargeAskWithSmallAsksTradeNoQuantityLeftOverAsksFirst() {
+
+        val orderBook = OrderBook()
+
+        val ask = Order(price = 112, quantity = 9, type = OrderType.ASK)
+
+        val bid1 = Order(price = 115, quantity = 3, type = OrderType.BID)
+        val bid2 = Order(price = 117, quantity = 4, type = OrderType.BID)
+        val bid3 = Order(price = 116, quantity = 2, type = OrderType.BID)
+
+        orderBook.processLimitOrder(ask)
+
+        orderBook.processLimitOrder(bid1)
+        orderBook.processLimitOrder(bid2)
+        orderBook.processLimitOrder(bid3)
+
+        assert(ask.isFulfilled())
+        assert(bid1.isFulfilled())
+        assert(bid2.isFulfilled())
+        assert(bid3.isFulfilled())
+
+        assert(orderBook.isEmpty())
+        assert(orderBook.asks.isEmpty())
+        assert(orderBook.bids.isEmpty())
+        assert(orderBook.trades.size == 3)
+        assert(orderBook.listPriceMap.isEmpty())
+        assert(orderBook.sequence == 3)
+        assert(orderBook.numOrders == 4)
+
+        assert(ask.quantity == 0)
+        assert(bid1.quantity == 0)
+        assert(bid2.quantity == 0)
+        assert(bid3.quantity == 0)
+        assert(bid1.orderTrades[0] == ask.orderTrades[0])
+        assert(bid2.orderTrades[0] == ask.orderTrades[1])
+        assert(bid3.orderTrades[0] == ask.orderTrades[2])
+        assert(bid1.orderTrades[0].quantity == 3)
+        assert(bid2.orderTrades[0].quantity == 4)
+        assert(bid3.orderTrades[0].quantity == 2)
+        assert(bid1.orderTrades[0].buyer == bid1)
+        assert(bid2.orderTrades[0].buyer == bid2)
+        assert(bid3.orderTrades[0].buyer == bid3)
+        assert(bid1.orderTrades[0].seller == ask)
+        assert(bid2.orderTrades[0].seller == ask)
+        assert(bid3.orderTrades[0].seller == ask)
+        assert(bid1.orderTrades[0].taker == OrderType.BID)
+        assert(bid2.orderTrades[0].taker == OrderType.BID)
+        assert(bid3.orderTrades[0].taker == OrderType.BID)
+
+    }
+
+    @Test
+    fun testLargeBidWithSmallAsksTradeNoQuantityLeftOverBidFirst() {
+
+        val orderBook = OrderBook()
+
+        val ask1 = Order(price = 112, quantity = 2, type = OrderType.ASK)
+        val ask2 = Order(price = 110, quantity = 3, type = OrderType.ASK)
+        val ask3 = Order(price = 111, quantity = 4, type = OrderType.ASK)
+
+        val bid = Order(price = 115, quantity = 9, type = OrderType.BID)
+
+        orderBook.processLimitOrder(bid)
+
+        orderBook.processLimitOrder(ask1)
+        orderBook.processLimitOrder(ask2)
+        orderBook.processLimitOrder(ask3)
+
+        assert(bid.isFulfilled())
+        assert(ask1.isFulfilled())
+        assert(ask2.isFulfilled())
+        assert(ask3.isFulfilled())
+
+        assert(orderBook.isEmpty())
+        assert(orderBook.asks.isEmpty())
+        assert(orderBook.bids.isEmpty())
+        assert(orderBook.trades.size == 3)
+        assert(orderBook.listPriceMap.isEmpty())
+        assert(orderBook.sequence == 3)
+        assert(orderBook.numOrders == 4)
+
+        assert(bid.quantity == 0)
+        assert(ask1.quantity == 0)
+        assert(ask2.quantity == 0)
+        assert(ask3.quantity == 0)
+        assert(ask1.orderTrades[0] == bid.orderTrades[0])
+        assert(ask2.orderTrades[0] == bid.orderTrades[1])
+        assert(ask3.orderTrades[0] == bid.orderTrades[2])
+        assert(ask1.orderTrades[0].quantity == 2)
+        assert(ask2.orderTrades[0].quantity == 3)
+        assert(ask3.orderTrades[0].quantity == 4)
+        assert(ask1.orderTrades[0].buyer == bid)
+        assert(ask2.orderTrades[0].buyer == bid)
+        assert(ask3.orderTrades[0].buyer == bid)
+        assert(ask1.orderTrades[0].seller == ask1)
+        assert(ask2.orderTrades[0].seller == ask2)
+        assert(ask3.orderTrades[0].seller == ask3)
+        assert(ask1.orderTrades[0].taker == OrderType.ASK)
+        assert(ask2.orderTrades[0].taker == OrderType.ASK)
+        assert(ask3.orderTrades[0].taker == OrderType.ASK)
+
+    }
+
+    @Test
+    fun testLargeAskWithSmallAsksTradeNoQuantityLeftOverBidsFirst() {
+
+        val orderBook = OrderBook()
+
+        val ask = Order(price = 112, quantity = 9, type = OrderType.ASK)
+
+        val bid1 = Order(price = 115, quantity = 3, type = OrderType.BID)
+        val bid2 = Order(price = 117, quantity = 4, type = OrderType.BID)
+        val bid3 = Order(price = 116, quantity = 2, type = OrderType.BID)
+
+        orderBook.processLimitOrder(bid1)
+        orderBook.processLimitOrder(bid2)
+        orderBook.processLimitOrder(bid3)
+
+        orderBook.processLimitOrder(ask)
+
+        assert(ask.isFulfilled())
+        assert(bid1.isFulfilled())
+        assert(bid2.isFulfilled())
+        assert(bid3.isFulfilled())
+
+        assert(orderBook.isEmpty())
+        assert(orderBook.asks.isEmpty())
+        assert(orderBook.bids.isEmpty())
+        assert(orderBook.trades.size == 3)
+        assert(orderBook.listPriceMap.isEmpty())
+        assert(orderBook.sequence == 3)
+        assert(orderBook.numOrders == 4)
+
+        assert(ask.quantity == 0)
+        assert(bid1.quantity == 0)
+        assert(bid2.quantity == 0)
+        assert(bid3.quantity == 0)
+        assert(bid2.orderTrades[0] == ask.orderTrades[0])
+        assert(bid3.orderTrades[0] == ask.orderTrades[1])
+        assert(bid1.orderTrades[0] == ask.orderTrades[2])
+        assert(bid1.orderTrades[0].quantity == 3)
+        assert(bid2.orderTrades[0].quantity == 4)
+        assert(bid3.orderTrades[0].quantity == 2)
+        assert(bid1.orderTrades[0].buyer == bid1)
+        assert(bid2.orderTrades[0].buyer == bid2)
+        assert(bid3.orderTrades[0].buyer == bid3)
+        assert(bid1.orderTrades[0].seller == ask)
+        assert(bid2.orderTrades[0].seller == ask)
+        assert(bid3.orderTrades[0].seller == ask)
+        assert(bid1.orderTrades[0].taker == OrderType.ASK)
+        assert(bid2.orderTrades[0].taker == OrderType.ASK)
+        assert(bid3.orderTrades[0].taker == OrderType.ASK)
+
+    }
+
+    @Test
+    fun testLargeAskWithSmallAsksTradeNoQuantityLeftOverAskFirst() {
+
+        val orderBook = OrderBook()
+
+        val ask = Order(price = 112, quantity = 9, type = OrderType.ASK)
+
+        val bid1 = Order(price = 115, quantity = 3, type = OrderType.BID)
+        val bid2 = Order(price = 117, quantity = 4, type = OrderType.BID)
+        val bid3 = Order(price = 116, quantity = 2, type = OrderType.BID)
+
+        orderBook.processLimitOrder(ask)
+
+        orderBook.processLimitOrder(bid1)
+        orderBook.processLimitOrder(bid2)
+        orderBook.processLimitOrder(bid3)
+
+        assert(ask.isFulfilled())
+        assert(bid1.isFulfilled())
+        assert(bid2.isFulfilled())
+        assert(bid3.isFulfilled())
+
+        assert(orderBook.isEmpty())
+        assert(orderBook.asks.isEmpty())
+        assert(orderBook.bids.isEmpty())
+        assert(orderBook.trades.size == 3)
+        assert(orderBook.listPriceMap.isEmpty())
+        assert(orderBook.sequence == 3)
+        assert(orderBook.numOrders == 4)
+
+        assert(ask.quantity == 0)
+        assert(bid1.quantity == 0)
+        assert(bid2.quantity == 0)
+        assert(bid3.quantity == 0)
+        assert(bid1.orderTrades[0] == ask.orderTrades[0])
+        assert(bid2.orderTrades[0] == ask.orderTrades[1])
+        assert(bid3.orderTrades[0] == ask.orderTrades[2])
+        assert(bid1.orderTrades[0].quantity == 3)
+        assert(bid2.orderTrades[0].quantity == 4)
+        assert(bid3.orderTrades[0].quantity == 2)
+        assert(bid1.orderTrades[0].buyer == bid1)
+        assert(bid2.orderTrades[0].buyer == bid2)
+        assert(bid3.orderTrades[0].buyer == bid3)
+        assert(bid1.orderTrades[0].seller == ask)
+        assert(bid2.orderTrades[0].seller == ask)
+        assert(bid3.orderTrades[0].seller == ask)
+        assert(bid1.orderTrades[0].taker == OrderType.BID)
+        assert(bid2.orderTrades[0].taker == OrderType.BID)
+        assert(bid3.orderTrades[0].taker == OrderType.BID)
+
+    }
+
+    @Test
+    fun testLargeAskWithSmallAsksTradeWithQuantityLeftOverBidsFirst() {
+
+        val orderBook = OrderBook()
+
+        val ask = Order(price = 112, quantity = 12, type = OrderType.ASK)
+
+        val bid1 = Order(price = 115, quantity = 3, type = OrderType.BID)
+        val bid2 = Order(price = 117, quantity = 4, type = OrderType.BID)
+        val bid3 = Order(price = 116, quantity = 2, type = OrderType.BID)
+
+        orderBook.processLimitOrder(bid1)
+        orderBook.processLimitOrder(bid2)
+        orderBook.processLimitOrder(bid3)
+
+        orderBook.processLimitOrder(ask)
+
+        assert(ask.isNotFulfilled())
+        assert(bid1.isFulfilled())
+        assert(bid2.isFulfilled())
+        assert(bid3.isFulfilled())
+
+        assert(!orderBook.isEmpty())
+        assert(orderBook.asks.isNotEmpty())
+        assert(orderBook.bids.isEmpty())
+        assert(orderBook.trades.size == 3)
+        assert(orderBook.listPriceMap.isNotEmpty())
+        assert(orderBook.sequence == 3)
+        assert(orderBook.numOrders == 4)
+
+        assert(ask.quantity == 3)
+        assert(bid1.quantity == 0)
+        assert(bid2.quantity == 0)
+        assert(bid3.quantity == 0)
+        assert(bid2.orderTrades[0] == ask.orderTrades[0])
+        assert(bid3.orderTrades[0] == ask.orderTrades[1])
+        assert(bid1.orderTrades[0] == ask.orderTrades[2])
+        assert(bid1.orderTrades[0].quantity == 3)
+        assert(bid2.orderTrades[0].quantity == 4)
+        assert(bid3.orderTrades[0].quantity == 2)
+        assert(bid1.orderTrades[0].buyer == bid1)
+        assert(bid2.orderTrades[0].buyer == bid2)
+        assert(bid3.orderTrades[0].buyer == bid3)
+        assert(bid1.orderTrades[0].seller == ask)
+        assert(bid2.orderTrades[0].seller == ask)
+        assert(bid3.orderTrades[0].seller == ask)
+        assert(bid1.orderTrades[0].taker == OrderType.ASK)
+        assert(bid2.orderTrades[0].taker == OrderType.ASK)
+        assert(bid3.orderTrades[0].taker == OrderType.ASK)
+
+    }
+
+    @Test
+    fun testLargeAskWithSmallAsksTradeWithQuantityLeftOverAskFirst() {
+
+        val orderBook = OrderBook()
+
+        val ask = Order(price = 112, quantity = 12, type = OrderType.ASK)
+
+        val bid1 = Order(price = 115, quantity = 3, type = OrderType.BID)
+        val bid2 = Order(price = 117, quantity = 4, type = OrderType.BID)
+        val bid3 = Order(price = 116, quantity = 2, type = OrderType.BID)
+
+        orderBook.processLimitOrder(ask)
+
+        orderBook.processLimitOrder(bid1)
+        orderBook.processLimitOrder(bid2)
+        orderBook.processLimitOrder(bid3)
+
+        assert(ask.isNotFulfilled())
+        assert(bid1.isFulfilled())
+        assert(bid2.isFulfilled())
+        assert(bid3.isFulfilled())
+
+        assert(!orderBook.isEmpty())
+        assert(orderBook.asks.peek().price == 112)
+        assert(orderBook.bids.isEmpty())
+        assert(orderBook.trades.size == 3)
+        assert(orderBook.listPriceMap[112] == orderBook.asks.peek())
+        assert(orderBook.sequence == 3)
+        assert(orderBook.numOrders == 4)
+
+        assert(ask.quantity == 3)
+        assert(bid1.quantity == 0)
+        assert(bid2.quantity == 0)
+        assert(bid3.quantity == 0)
+        assert(bid1.orderTrades[0] == ask.orderTrades[0])
+        assert(bid2.orderTrades[0] == ask.orderTrades[1])
+        assert(bid3.orderTrades[0] == ask.orderTrades[2])
+        assert(bid1.orderTrades[0].quantity == 3)
+        assert(bid2.orderTrades[0].quantity == 4)
+        assert(bid3.orderTrades[0].quantity == 2)
+        assert(bid1.orderTrades[0].buyer == bid1)
+        assert(bid2.orderTrades[0].buyer == bid2)
+        assert(bid3.orderTrades[0].buyer == bid3)
+        assert(bid1.orderTrades[0].seller == ask)
+        assert(bid2.orderTrades[0].seller == ask)
+        assert(bid3.orderTrades[0].seller == ask)
+        assert(bid1.orderTrades[0].taker == OrderType.BID)
+        assert(bid2.orderTrades[0].taker == OrderType.BID)
+        assert(bid3.orderTrades[0].taker == OrderType.BID)
 
     }
 
