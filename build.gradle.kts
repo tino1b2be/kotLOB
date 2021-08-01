@@ -16,7 +16,6 @@ dependencies {
     implementation ("org.json:json:20210307")
     implementation("org.junit.jupiter:junit-jupiter:5.7.0")
     testImplementation(kotlin("test"))
-
 }
 
 tasks.test {
@@ -31,3 +30,6 @@ application {
     mainClass.set( "MainKt" )
 }
 
+tasks.getByName<JavaExec>("run") {
+    standardInput = System.`in`
+}
