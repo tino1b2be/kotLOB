@@ -1,4 +1,6 @@
-import OrderType.*
+package com.tino1b2be.kotlob
+
+import com.tino1b2be.kotlob.OrderType.*
 import java.util.*
 import kotlin.collections.HashMap
 

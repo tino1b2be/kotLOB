@@ -1,5 +1,6 @@
+package com.tino1b2be.kotlob
+
 import java.util.*
-import kotlin.Comparator
 
 /**
  * Stores a list or orders for a given price and order type/side
