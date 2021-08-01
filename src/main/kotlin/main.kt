@@ -1,3 +1,9 @@
+import com.tino1b2be.kotlob.Order
+import com.tino1b2be.kotlob.OrderBook
+import com.tino1b2be.kotlob.OrderType
+import com.tino1b2be.kotlob.Util
+import kotlin.system.exitProcess
+
 fun main() {
 
     val orderBook = OrderBook()
@@ -15,7 +21,8 @@ fun main() {
         println("1. Print Order Book JSON")
         println("2. Add new limit order")
         println("3. Recent trades JSON")
-        print("What is your option ( type 1, 2 or 3 ) ? : ")
+        println("4. Quit")
+        print("What is your option ( type 1, 2, 3 or 4 ) ? : ")
 
         when (Integer.valueOf(readLine())) {
             1 -> { // print order book
@@ -69,6 +76,9 @@ fun main() {
             }
             3 -> {
                 println(orderBook.getRecentTrades())
+            }
+            4 -> {
+                exitProcess(0)
             }
             else -> {
                 println("Invalid input. try again")

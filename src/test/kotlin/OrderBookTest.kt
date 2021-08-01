@@ -1,3 +1,7 @@
+import com.tino1b2be.kotlob.Order
+import com.tino1b2be.kotlob.OrderBook
+import com.tino1b2be.kotlob.OrderType
+import com.tino1b2be.kotlob.Util
 import org.junit.Test
 
 class OrderBookTest {

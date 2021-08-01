@@ -15,7 +15,6 @@ repositories {
 dependencies {
     implementation ("org.json:json:20210307")
     implementation("org.junit.jupiter:junit-jupiter:5.7.0")
-    implementation("org.junit.jupiter:junit-jupiter:5.7.0")
     testImplementation(kotlin("test"))
 }
 
@@ -28,5 +27,9 @@ tasks.withType<KotlinCompile>() {
 }
 
 application {
-    mainClassName = "MainKt"
+    mainClass.set( "MainKt" )
+}
+
+tasks.getByName<JavaExec>("run") {
+    standardInput = System.`in`
 }
