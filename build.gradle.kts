@@ -5,8 +5,8 @@ plugins {
     application
 }
 
-group = "me.ttche"
-version = "1.0-SNAPSHOT"
+group = "com.tino1b2be"
+version = "1.0.0-beta"
 
 repositories {
     mavenCentral()
