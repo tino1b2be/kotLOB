@@ -34,9 +34,11 @@ The web API was built using vert.x and supports three functions:
 
 HTTP POST - `/v1/orderbook/limit` with the following POST parameters:
 
+```
 price = int
 qty = int
 type = "bid" or "ask"
+```
 
 Example using cURL:
 
