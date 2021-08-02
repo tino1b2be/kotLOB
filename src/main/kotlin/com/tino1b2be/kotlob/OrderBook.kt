@@ -8,10 +8,14 @@ import kotlin.collections.HashMap
  * Implementation of a Limit Order Book
  */
 class OrderBook(
-    // priority queue with lowest asking price at top TODO("could possibly optimise asks")
-    var asks: PriorityQueue<ListOrdersAtPrice> = PriorityQueue<ListOrdersAtPrice>(),
-    // priority queue with highest bidding price at top TODO("could possibly optimise bids")
-    var bids: PriorityQueue<ListOrdersAtPrice> = PriorityQueue<ListOrdersAtPrice>(Collections.reverseOrder()),
+
+    var asks: TreeMap<Int, ListOrdersAtPrice> = TreeMap(),
+    var bids: TreeMap<Int, ListOrdersAtPrice> = TreeMap(Collections.reverseOrder()),
+
+//    // priority queue with lowest asking price at top
+//    var asks: PriorityQueue<ListOrdersAtPrice> = PriorityQueue<ListOrdersAtPrice>(),
+//    // priority queue with highest bidding price at top
+//    var bids: PriorityQueue<ListOrdersAtPrice> = PriorityQueue<ListOrdersAtPrice>(Collections.reverseOrder()),
 
     // arraylist to store all trades that happen in the order book TODO("could possibly optimise trades list")
     var trades: ArrayList<Trade> = ArrayList<Trade>(),
@@ -63,37 +67,41 @@ class OrderBook(
 
         var returnString = "{\n \"Asks\":[\n"
         // get top [num] asks
-        for ((index, listOfOrders) in asks.withIndex()) {
+        var index = 0
+        for (listOfOrders in asks) {
             var listString = " {\n" +
                     "   \"side\":\"sell\",\n" +
-                    "   \"quantity\":${listOfOrders.quantityTotal},\n" +
-                    "   \"price\":${listOfOrders.price},\n" +
-                    "   \"orderCount\":${listOfOrders.getSize()}\n" +
+                    "   \"quantity\":${listOfOrders.value.quantityTotal},\n" +
+                    "   \"price\":${listOfOrders.value.price},\n" +
+                    "   \"orderCount\":${listOfOrders.value.getSize()}\n" +
                     "  }"
 
             if (index < num && index < asks.size - 1) listString = "$listString,\n" // add comma
             returnString = "$returnString $listString"
+            index++
             if (index >= num) break
         }
 
         returnString = "$returnString\n ],\n \"Bids\":[\n"
 
         // get top [num] bids
-        for ((index, listOfOrders) in bids.withIndex()) {
+        index = 0
+        for (listOfOrders in bids) {
             var listString = " {\n" +
                     "   \"side\":\"buy\",\n" +
-                    "   \"quantity\":${listOfOrders.quantityTotal},\n" +
-                    "   \"price\":${listOfOrders.price},\n" +
-                    "   \"orderCount\":${listOfOrders.getSize()}\n" +
+                    "   \"quantity\":${listOfOrders.value.quantityTotal},\n" +
+                    "   \"price\":${listOfOrders.value.price},\n" +
+                    "   \"orderCount\":${listOfOrders.value.getSize()}\n" +
                     "   }"
 
             if (index < num && index < bids.size - 1) listString = "$listString,\n" // add comma
             returnString = "$returnString $listString" // append orders to string
+            index++
             if (index >= num) break
         }
+
         // TODO format the date to ISO 8601
         returnString = "$returnString \n  ],\n  \"LastChange\": \"$lastUpdateTime\"\n}"
-
         return returnString
     }
 
@@ -129,13 +137,15 @@ class OrderBook(
     private fun processBidOrder(newBidOrder: Order) {
         // Process trades at each OrdersAtPrice list inside asks starting with the lowest asking price until the asking price is higher than the bidding price
 
-        while ((!asks.isEmpty()) && newBidOrder.quantity > 0 && newBidOrder.price >= asks.peek().price) {
-            val lowestAsks: ListOrdersAtPrice = asks.peek()
-            lowestAsks.processTradesBidOrder(newBidOrder, this)
+        while ((!asks.isEmpty()) && newBidOrder.quantity > 0 && newBidOrder.price >= asks.firstKey()) {
+            val lowestAsks: ListOrdersAtPrice? = asks[asks.firstKey()]
+            lowestAsks?.processTradesBidOrder(newBidOrder, this)
             // remove list if there are no more orders at this price.
-            if (lowestAsks.getSize() == 0) {
-                asks.poll()
-                listPriceMap.remove(lowestAsks.price)
+            if (lowestAsks != null) {
+                if (lowestAsks.getSize() == 0) {
+                    asks.remove(lowestAsks.price)
+                    listPriceMap.remove(lowestAsks.price)
+                }
             }
         }
 
@@ -147,13 +157,15 @@ class OrderBook(
     private fun processAskOrder(newAskOrder: Order) {
         // Process trades at each OrdersAtPrice list inside bids starting with the highest bidding price until the bidding price is lower than asking price
 
-        while ((!bids.isEmpty()) && (newAskOrder.quantity > 0) && (newAskOrder.price <= bids.peek().price)) {
-            val highestBids: ListOrdersAtPrice = bids.peek()
-            highestBids.processTradesAskOrder(newAskOrder, this)
+        while ((!bids.isEmpty()) && (newAskOrder.quantity > 0) && (newAskOrder.price <= bids.firstKey())) {
+            val highestBids: ListOrdersAtPrice? = bids[bids.firstKey()]
+            highestBids?.processTradesAskOrder(newAskOrder, this)
             // remove list if there are no more orders at this price.
-            if (highestBids.getSize() == 0) {
-                bids.poll()
-                listPriceMap.remove(highestBids.price)
+            if (highestBids != null) {
+                if (highestBids.getSize() == 0) {
+                    bids.remove(highestBids.price)
+                    listPriceMap.remove(highestBids.price)
+                }
             }
         }
     }
@@ -181,7 +193,7 @@ class OrderBook(
             listPrice = ListOrdersAtPrice(order.price)
             // add list to order book priority queue and Map
             listPriceMap[order.price] = listPrice
-            if (order.type == BID) bids.add(listPrice) else asks.add(listPrice)
+            if (order.type == BID) bids[order.price] = listPrice else asks[order.price] = listPrice
             listPrice
         }
     }
