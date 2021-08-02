@@ -61,33 +61,33 @@ class OrderBook(
      */
     fun getOrderBookJSON(num: Int): String {
 
-        var returnString = "{\n \"Asks\":[\n  "
+        var returnString = "{\n \"Asks\":[\n"
         // get top [num] asks
         for ((index, listOfOrders) in asks.withIndex()) {
-            var listString = "{\n" +
+            var listString = " {\n" +
                     "   \"side\":\"sell\",\n" +
-                    "   \"quantity\":\"${listOfOrders.quantityTotal}\",\n" +
-                    "   \"price\":\"${listOfOrders.price}\",\n" +
+                    "   \"quantity\":${listOfOrders.quantityTotal},\n" +
+                    "   \"price\":${listOfOrders.price},\n" +
                     "   \"orderCount\":${listOfOrders.getSize()}\n" +
-                    "    }"
+                    "  }"
 
-            if (index < num && index < asks.size - 1) listString = "$listString," // add comma
+            if (index < num && index < asks.size - 1) listString = "$listString,\n" // add comma
             returnString = "$returnString $listString"
             if (index >= num) break
         }
 
-        returnString = "$returnString\n  ],\n  \"Bids\":[\n  "
+        returnString = "$returnString\n ],\n \"Bids\":[\n"
 
         // get top [num] bids
         for ((index, listOfOrders) in bids.withIndex()) {
-            var listString = "{\n" +
+            var listString = " {\n" +
                     "   \"side\":\"buy\",\n" +
-                    "   \"quantity\":\"${listOfOrders.quantityTotal}\",\n" +
-                    "   \"price\":\"${listOfOrders.price}\",\n" +
+                    "   \"quantity\":${listOfOrders.quantityTotal},\n" +
+                    "   \"price\":${listOfOrders.price},\n" +
                     "   \"orderCount\":${listOfOrders.getSize()}\n" +
-                    "}"
+                    "   }"
 
-            if (index < num && index < bids.size - 1) listString = "$listString," // add comma
+            if (index < num && index < bids.size - 1) listString = "$listString,\n" // add comma
             returnString = "$returnString $listString" // append orders to string
             if (index >= num) break
         }

@@ -47,8 +47,15 @@ class Order(
         orderTrades.add(newTrade)
     }
 
+    fun getJSONstatus(): String {
+
+        return "{\n" +
+                "\t\"orderId\": \"${this.id}\"\n" +
+                "}"
+    }
+
     override fun toString(): String {
-        return "$type | qty=$quantity   | price=$price"
+        return "$type | qty-left=$quantity   | price=$price"
     }
 
 }
