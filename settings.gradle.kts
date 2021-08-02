@@ -1,3 +1,1 @@
-
-rootProject.name = "kotLOB"
-
+rootProject.name = "kotlob"
