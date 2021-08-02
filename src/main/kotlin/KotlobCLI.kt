@@ -2,15 +2,69 @@ import com.tino1b2be.kotlob.Order
 import com.tino1b2be.kotlob.OrderBook
 import com.tino1b2be.kotlob.OrderType
 import com.tino1b2be.kotlob.Util
+import java.util.*
 import kotlin.system.exitProcess
+import kotlin.system.measureTimeMillis
+
+fun generateRandomOrders(num: Int): LinkedList<Order> {
+
+    val ls = LinkedList<Order>()
+
+    // generate bids with price between 100 and 120
+    for (i in 0..num) {
+        val price: Int = (100..120).random()
+        val type = OrderType.BID
+        val quantity: Int = (1..100).random()
+        ls.add(Order(price, quantity, type))
+    }
+
+    // generate asks with price between 121 and 140
+    for (i in 0..num) {
+        val price: Int = (121..140).random()
+        val type = OrderType.ASK
+        val quantity: Int = (1..100).random()
+        ls.add(Order(price, quantity, type))
+    }
+
+    // generate random orders with price between 100 and 140
+    for (i in 0..(num * 2)) {
+        val price: Int = (100..140).random()
+        val type = OrderType.values().toList().shuffled().first()
+        val quantity: Int = (1..100).random()
+        ls.add(Order(price, quantity, type))
+    }
+
+    return ls
+}
 
 fun main() {
+
+    val orderBook = OrderBook()
+    var orders: LinkedList<Order>
+
+    val executionTimeforGenOrders = measureTimeMillis {
+        orders = generateRandomOrders(1000000)
+    }
+
+    println("total time to generate orders = ${executionTimeforGenOrders}ms")
+
+    val executionTime = measureTimeMillis {
+        orders.forEach { orderBook.processLimitOrder(it) }
+    }
+
+    println("total time to process ${orders.size} orders = ${executionTime}ms")
+    println("total number of trades = ${orderBook.trades.size}")
+//    println(orderBook.getRecentTrades())
+
+}
+
+fun main2() {
 
     val orderBook = OrderBook()
     val sampleOrders = Util.loadOrdersFromJsonFile("src/sample_orders.json")
 
     // add sample orders
-    for ( order in sampleOrders){
+    for (order in sampleOrders) {
         orderBook.processLimitOrder(order)
     }
     println("Welcome to the KotLOB limit order book interactive CLI")
