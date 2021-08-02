@@ -37,13 +37,13 @@ fun generateRandomOrders(num: Int): LinkedList<Order> {
     return ls
 }
 
-fun main() {
+fun main2() {
 
     val orderBook = OrderBook()
     var orders: LinkedList<Order>
 
     val executionTimeforGenOrders = measureTimeMillis {
-        orders = generateRandomOrders(1000000)
+        orders = generateRandomOrders(2000000)
     }
 
     println("total time to generate orders = ${executionTimeforGenOrders}ms")
@@ -58,7 +58,7 @@ fun main() {
 
 }
 
-fun main2() {
+fun main() {
 
     val orderBook = OrderBook()
     val sampleOrders = Util.loadOrdersFromJsonFile("src/sample_orders.json")
