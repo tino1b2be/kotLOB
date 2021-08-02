@@ -35,18 +35,18 @@ class OrderBook(
 
     fun getRecentTrades(num: Int): String {
 
-        var returnString = "[\n  "
+        var returnString = "[\n"
 
         for ((index, trade) in trades.withIndex()) {
-            var tradeString = "  {\n" +
-                    "    \"price\":\"${trade.price}\",\n" +
-                    "    \"quantity\":\"${trade.quantity}\",\n" +
-                    "    \"tradedAt\":\"${trade.timestamp}\",\n" +
-                    "    \"takerSide\":\"${trade.taker}\",\n" +
-                    "    \"sequence\":\"${trade.sequence}\",\n" +
-                    "    \"id\":\"${trade.id}\"\n" +
-                    "}\n"
-            if (index < num && index < trades.size) tradeString = "$tradeString," // add comma
+            var tradeString = " {\n" +
+                    "  \"price\":\"${trade.price}\",\n" +
+                    "  \"quantity\":\"${trade.quantity}\",\n" +
+                    "  \"tradedAt\":\"${trade.timestamp}\",\n" +
+                    "  \"takerSide\":\"${trade.taker}\",\n" +
+                    "  \"sequence\":\"${trade.sequence}\",\n" +
+                    "  \"id\":\"${trade.id}\"\n" +
+                    " }"
+            if (index < num && index < trades.size - 1) tradeString = "$tradeString,\n" // add comma
             returnString = "$returnString $tradeString"
             if (index >= num) break
         }

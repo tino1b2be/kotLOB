@@ -3,7 +3,6 @@ import com.tino1b2be.kotlob.OrderBook
 import com.tino1b2be.kotlob.OrderType
 import com.tino1b2be.kotlob.Util
 import io.vertx.core.AbstractVerticle
-import io.vertx.core.Vertx
 import io.vertx.core.http.HttpServerRequest
 import io.vertx.ext.web.Router
 import io.vertx.ext.web.RoutingContext
@@ -115,11 +114,11 @@ class KotlobAPI(
         println("Bye")
     }
 
-    companion object {
-        @JvmStatic
-        fun main(args: Array<String>) {
-            val vertx: Vertx = Vertx.vertx()
-            vertx.deployVerticle(KotlobAPI())
-        }
-    }
+//    companion object {
+//        @JvmStatic
+//        fun main(args: Array<String>) {
+//            val vertx: Vertx = Vertx.vertx()
+//            vertx.deployVerticle(KotlobAPI())
+//        }
+//    }
 }
