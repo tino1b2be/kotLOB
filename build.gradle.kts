@@ -13,7 +13,11 @@ repositories {
 }
 
 dependencies {
-    implementation ("org.json:json:20210307")
+    implementation("org.json:json:20210307")
+    implementation(platform("io.vertx:vertx-stack-depchain:4.1.2"))
+    implementation("io.vertx:vertx-web")
+    implementation("io.vertx:vertx-lang-kotlin")
+    testImplementation("io.vertx:vertx-junit5")
     implementation("org.junit.jupiter:junit-jupiter:5.7.0")
     testImplementation(kotlin("test"))
 }
@@ -27,9 +31,16 @@ tasks.withType<KotlinCompile>() {
 }
 
 application {
-    mainClass.set( "MainKt" )
+    mainClass.set("KotWebKt")
 }
 
-tasks.getByName<JavaExec>("run") {
-    standardInput = System.`in`
-}
+//tasks.getByName<JavaExec>("run") {
+//    standardInput = System.`in`
+//}
+
+//tasks.withType<Jar> {
+//    manifest {
+//        attributes["Main-Class"] = "KotWebKt"
+//    }
+//}
+
