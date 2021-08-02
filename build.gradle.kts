@@ -34,9 +34,9 @@ application {
     mainClass.set("KotWebKt")
 }
 
-//tasks.getByName<JavaExec>("run") {
-//    standardInput = System.`in`
-//}
+tasks.getByName<JavaExec>("run") {
+    standardInput = System.`in`
+}
 
 //tasks.withType<Jar> {
 //    manifest {
